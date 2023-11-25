@@ -1,0 +1,16 @@
+{
+  "name": "serverless",
+  "version": "1.0.0",
+  "description": "Lambda function to handle assignment submissions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Skudli",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/storage": "^7.6.0",
+    "axios": "^1.6.2",
+    "mailgun-js": "^0.22.0"
+  }
+}
