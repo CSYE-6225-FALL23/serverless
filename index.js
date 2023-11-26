@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
 
         const file = await downloadSubmissionZip(submissionUrl);
         if (!file) {
-            emailStatus = await sendEmailToUser(email, "test");
+            emailStatus = await sendEmailToUser(email, "fail");
         } else {
             submissionStatus = true;
 
