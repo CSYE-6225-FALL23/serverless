@@ -4,7 +4,8 @@
   "description": "Lambda function to handle assignment submissions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"**/*.js\""
   },
   "author": "Skudli",
   "license": "ISC",
@@ -12,5 +13,8 @@
     "@google-cloud/storage": "^7.6.0",
     "axios": "^1.6.2",
     "mailgun-js": "^0.22.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
   }
 }
