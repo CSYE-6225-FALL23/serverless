@@ -151,14 +151,14 @@ const sendEmailToUser = async (email, type) => {
   if (type === "success") {
     data = {
       from: "CSYE6225 Submission notifications@skudli.xyz",
-      to: "kudli.s@northeastern.edu",
+      to: email,
       subject: "Assignment submission accecpted",
       text: "Your submission was successfully received and verified. Thank you.",
     };
   } else if (type === "fail") {
     data = {
       from: "CSYE6225 Submission notifications@skudli.xyz",
-      to: "kudli.s@northeastern.edu",
+      to: email,
       subject: "Assignment submission failed",
       text: "Your submission could not be downloaded. Please verify the URL and resubmit.",
     };
