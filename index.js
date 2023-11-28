@@ -9,20 +9,24 @@ const { Storage } = require("@google-cloud/storage");
 
 exports.handler = async (event, context) => {
   try {
+    // Track status of every activity
     let submissionStatus = false;
     let gcsStatus = false;
     let emailStatus = false;
 
+    // Parse base64 decoded access key to GCP
     const snsMessage = JSON.parse(event.Records[0].Sns.Message);
     const { submissionUrl, email, userId, submissionId, assignmentId } =
       snsMessage;
 
+    // Download zip file
     const file = await downloadSubmissionZip(submissionUrl);
     if (!file) {
+        // Send email for failed submission
       emailStatus = await sendEmailToUser(email, "fail");
     } else {
       submissionStatus = true;
-
+      // Send email for successful submission
       [submissionStatus, emailStatus] = await Promise.all([
         uploadToGCS(file, assignmentId, userId),
         sendEmailToUser(email, "success"),
@@ -38,6 +42,7 @@ exports.handler = async (event, context) => {
       }),
     );
 
+    // Save status in DynamoDB
     await createEventInDynamoDB({
       userId: userId,
       email: email,
@@ -52,6 +57,12 @@ exports.handler = async (event, context) => {
   }
 };
 
+/**
+ * Download submisison zip file
+ *
+ * @param {String} submissionUrl - Submission URL
+ * @returns {Buffer} Downloaded buffer
+ */
 const downloadSubmissionZip = async (submissionUrl) => {
   try {
     const response = await axios.get(submissionUrl, { responseType: "stream" });
@@ -69,13 +80,22 @@ const downloadSubmissionZip = async (submissionUrl) => {
   }
 };
 
+/**
+ * Upload zip file to GCS
+ *
+ * @param {Buffer} submissionFile - Submission File
+ * @param {String} assignmentId - Assignment ID
+ * @param {String} userId - User ID
+ * @returns {Promise} Resolves to Boolean
+ */
 const uploadToGCS = async (submissionFile, assignmentId, userId) => {
   console.info("Uploading zip to GCS...");
   try {
     // Create a GCS client
-    const serviceAccountKey = JSON.parse(atob(process.env.GCP_SERVICE_ACCOUNT_PVT_KEY));
+    const serviceAccountKey = JSON.parse(
+      atob(process.env.GCP_SERVICE_ACCOUNT_PVT_KEY),
+    );
     const storage = new Storage({ credentials: serviceAccountKey });
-    // const storage = new Storage({ keyFilename: "./accesskeys.json" });
 
     // GitHub and GCS information
     const gcsFileName = `${assignmentId}/${userId}.zip`;
@@ -105,6 +125,12 @@ const uploadToGCS = async (submissionFile, assignmentId, userId) => {
   }
 };
 
+/**
+ * Track events in DynamoDB
+ *
+ * @param {Object} snsMessage - Message Details
+ * @returns {Promise} Resolves to Boolean
+ */
 const createEventInDynamoDB = async (snsMessage) => {
   console.log("Inserting event to DynamoDB", JSON.stringify(snsMessage));
   try {
@@ -138,6 +164,13 @@ const createEventInDynamoDB = async (snsMessage) => {
   }
 };
 
+/**
+ * Send email to user
+ *
+ * @param {Object} email - Email ID
+ * @param {Object} type - Type of Email (success/fail)
+ * @returns {Promise} Resolves to Boolean
+ */
 const sendEmailToUser = async (email, type) => {
   // Replace these with your Mailgun API key and domain
   const apiKey = process.env.EMAIL_API_KEY;
