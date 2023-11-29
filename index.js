@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
     // Download zip file
     const file = await downloadSubmissionZip(submissionUrl);
     if (!file) {
-        // Send email for failed submission
+      // Send email for failed submission
       emailStatus = await sendEmailToUser(email, "fail");
     } else {
       submissionStatus = true;
@@ -183,17 +183,15 @@ const sendEmailToUser = async (email, type) => {
   let data;
   if (type === "success") {
     data = {
-      from: "CSYE6225 Submission notifications@skudli.xyz",
+      from: `CSYE6225 Submission Status <notifications@${domain}>`,
       to: email,
-      subject: "Assignment submission accecpted",
-      text: "Your submission was successfully received and verified. Thank you.",
+      template: "csye6225-success",
     };
   } else if (type === "fail") {
     data = {
-      from: "CSYE6225 Submission notifications@skudli.xyz",
+      from: `CSYE6225 Submission Status <notifications@${domain}>`,
       to: email,
-      subject: "Assignment submission failed",
-      text: "Your submission could not be downloaded. Please verify the URL and resubmit.",
+      template: "csye6225-fail",
     };
   }
 
